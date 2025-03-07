@@ -24,7 +24,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Oberserver-Optionen: Hier wird festgelegt, dass ein Element ab als 80% sichtbar gilt
     const observerOptions = {
-        threshold: 0.5
+        threshold: 0.8,
+        // Erweitern der Beobachtung horizontal, sodass X-Verschiebungen ignoriert werden
+        rootMargin: '0px 10000px 0px 10000px'
     };
 
     // IntersectionObserver-Callback
@@ -33,16 +35,33 @@ document.addEventListener('DOMContentLoaded', function() {
             // Ermitteln des Index des beobachteten Elements
             const index = Array.from(contents).indexOf(entry.target);
 
-            // Überprüfung der Sichtbarkeit
+            // Zuerst: Bei intersecting-Elementen -> Klasse hinzufügen
             if (entry.isIntersecting) {
                 entry.target.classList.add('show');
             }
-            else {
-                if (index > 2) {
-                    entry.target.classList.remove('show');
-                }
+        });
+
+        const nonIntersecting = entries.filter(entry => !entry.isIntersecting);
+        
+        // Überprüfen, ob es nicht-intersecting Elemente gibt
+        if (nonIntersecting.length > 0) {
+
+            // Bestimmen des Elements, das am weitesten unten liegt
+            const bottomEntry = nonIntersecting.reduce((prev, curr) => {
+                return curr.boundingClientRect.top > prev.boundingClientRect.top ? curr : prev;
+            });
+
+            // Prüfung, ob das unterste Element tatsächlich vom unteren Rand verschwindet
+            if (bottomEntry.boundingClientRect.top > 0) {
+                // Ermitteln des Index des Elements in der Gesamtliste
+            const index = Array.from(contents).indexOf(bottomEntry.target);
+
+            // Entfernen der Klasse .show bei Erfüllung der Bedingung
+            if (index > 2) {
+                bottomEntry.target.classList.remove('show');
             }
-        })
+            }            
+        }
     }, observerOptions);
 
     // Beobachtung der entsprechenden Elemente

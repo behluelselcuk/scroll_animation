@@ -36,11 +36,11 @@ h1 {
 }
 
 .content:nth-of-type(odd) {
-    transform: translateX(-100%);
+    transform: translateX(-400%);
 }
 
 .content:nth-of-type(even) {
-    transform: translateX(100%);
+    transform: translateX(400%);
 }
 
 .content.show {
